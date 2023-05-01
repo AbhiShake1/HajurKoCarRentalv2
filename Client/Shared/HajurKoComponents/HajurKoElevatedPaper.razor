@@ -1,0 +1,22 @@
+﻿<Animation>
+    <MudPaper Class="@GetCssClass" Width="@Width" Elevation="10">
+        @ChildContent
+    </MudPaper>
+</Animation>
+
+@code {
+
+    [Parameter]
+    public string Width { get; set; }
+
+    [Parameter]
+    public double PaddingX { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public ColorScheme Color { get; set; } = ColorScheme.Transparent;
+
+    private string GetCssClass => $"py-8 mud-theme-{Color.ToString().ToLower()} px-{PaddingX}";
+}

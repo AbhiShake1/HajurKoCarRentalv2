@@ -1,0 +1,130 @@
+﻿@using HajurKoCarRental.Client.Features.Auth.Data
+@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@inject HajurKoDialogService DialogService
+
+<MudThemeProvider Theme="_theme"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<CascadingValue Value="@BloodState">
+    <MudLayout>
+        @if (BloodState?.User is not null)
+        {
+            <MudAppBar Elevation="2">
+                <div class="d-md-none d-lg-none d-xl-none d-xxl-none">
+                    <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                                   Color="Color.Primary" Edge="Edge.Start" OnClick="@DrawerToggle"/>
+                </div>
+                <div class="d-none d-md-block d-lg-block d-xl-block d-xxl-block">
+                    <MudStack Spacing="1" Row="true">
+                        <HajurKoNavItem Title="Home" Href="@Routes.Home" Enabled="@NavigationManager.Uri.Contains(Routes.Home)"/>
+
+                        @if (BloodState.Permissions?.CanGetCars ?? false)
+                        {
+                            <HajurKoNavItem Title="Cars" Href="@Routes.Cars" Enabled="@NavigationManager.Uri.Contains(Routes.Cars)"/>
+                        }
+
+                        @if (BloodState.Permissions?.CanGetStaffs ?? false)
+                        {
+                            <HajurKoNavItem Title="Staffs" Href="@Routes.Staffs" Enabled="@NavigationManager.Uri.Contains(Routes.Staffs)"/>
+                        }
+
+                        @* @if (BloodState.Permissions?.CanGetUsers ?? false) *@
+                        @* { *@
+                        @*     <HajurKoNavItem Title="Staffs" Href="@Routes.Staffs" Enabled="@NavigationManager.Uri.Contains(Routes.Staffs)"/> *@
+                        @* } *@
+
+                        @if (BloodState.Permissions?.CanGetRentalRequests ?? false)
+                        {
+                            <HajurKoNavItem Title="Requests" Href="@Routes.Requests" Enabled="@NavigationManager.Uri.Contains(Routes.Requests)"/>
+                        }
+
+                        <HajurKoNavItem Title="Profile" Href="@Routes.Profile" Enabled="@NavigationManager.Uri.Contains(Routes.Profile)"/>
+                        @if (BloodState.Permissions?.CanGetDamages ?? false)
+                        {
+                            <HajurKoNavItem Title="Damage Requests" Href="@Routes.DamageRequests" Enabled="@NavigationManager.Uri.Contains(Routes.DamageRequests)"/>
+                        }
+                    </MudStack>
+                </div>
+                <MudSpacer/>
+                <HajurKoButton Icon="@Icons.Material.Filled.Logout" OnClick="@_onLogout"/>
+            </MudAppBar>
+            <div class="d-md-none d-lg-none d-xl-none d-xxl-none">
+                <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
+                    <MudDrawerHeader>
+                        <MudText Typo="Typo.h6">HajurKoCarRental</MudText>
+                    </MudDrawerHeader>
+                    <NavMenu/>
+                </MudDrawer>
+            </div>
+        }
+        <MudMainContent>
+            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="py-16">
+                @Body
+            </MudContainer>
+        </MudMainContent>
+    </MudLayout>
+</CascadingValue>
+
+
+@code {
+    bool _drawerOpen;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    public BloodState? BloodState { get; set; }
+
+    [Inject]
+    private AuthRepository _authRepository { get; set; }
+
+    readonly bool _isLoggedIn = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await _authRepository.GetUser();
+        BloodState = new BloodState
+        {
+            User = user?.User,
+            Permissions = user?.Permissions
+        };
+
+        NavigationManager.NavigateTo(user is not null ? Routes.Home : Routes.Signup);
+    }
+
+    private async Task _onLogout()
+    {
+        var confirmed = await DialogService.ShowDefaultAsync(
+            title: "Logout",
+            contentText: "Do you really want to logout?",
+            confirmText: "Yes", color:
+                Color.Error
+            );
+        if (confirmed)
+        {
+            BloodState.User = null;
+            BloodState.Permissions = null;
+            await _authRepository.DeleteUser();
+            NavigationManager.NavigateTo(Routes.Signup);
+        }
+    }
+
+    private readonly MudTheme _theme = new()
+    {
+        Palette = new Palette
+        {
+            Primary = Colors.DeepOrange.Default,
+            Secondary = Colors.Green.Accent4,
+            Tertiary = Colors.DeepOrange.Lighten3,
+            AppbarBackground = "#fff"
+        },
+        LayoutProperties = new LayoutProperties
+        {
+            DefaultBorderRadius = "24px"
+        }
+    };
+
+}

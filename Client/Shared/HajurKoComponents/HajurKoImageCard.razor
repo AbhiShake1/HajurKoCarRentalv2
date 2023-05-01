@@ -1,0 +1,43 @@
+﻿<MudCard Style="@_getCardStyle()" Elevation="@_elevation" @onmouseenter="@_elevate" @onmouseout="@_deElevate">
+    <MudCardMedia Image="@ImageUrl" Style="width: 208px;"/>
+    <MudCardActions>
+        @if (Title is not null)
+        {
+            <MudToggleIconButton @bind-Toggled="@_isFav"
+                                 Icon="@Icons.Material.Filled.FavoriteBorder" Color="@Color.Surface" Title="Add To Favourites"
+                                 ToggledIcon="@Icons.Material.Filled.Favorite" ToggledColor="@Color.Error" ToggledTitle="Favourite"/>
+            <MudText>@Title</MudText>
+        }
+    </MudCardActions>
+</MudCard>
+
+@code {
+    private bool _isFav { get; set; }
+
+    [Parameter]
+    public string ImageUrl { get; set; } = "";
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public string? BackgroundColor { get; set; }
+
+    private int _elevation { get; set; } = 0;
+
+    private void _elevate()
+    {
+        _elevation = 10;
+    }
+
+    private void _deElevate()
+    {
+        _elevation = 0;
+    }
+
+    private string _getCardStyle()
+    {
+        return $"background-color: {BackgroundColor}";
+    }
+
+}

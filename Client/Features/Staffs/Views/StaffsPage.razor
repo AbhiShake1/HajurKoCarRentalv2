@@ -1,0 +1,97 @@
+﻿@using HajurKoCarRental.Client.Features.Staffs.Data
+@using HajurKoCarRental.Shared.Models.DataModels
+@using HajurKoCarRental.Client.Features.Auth.Data
+@inject ISnackbar Snackbar
+@inject HajurKoDialogService DialogService
+@inject AuthRepository _authRepository
+@attribute [Route(Routes.Staffs)]
+
+<PageTitle>Staffs</PageTitle>
+
+<MudStack Spacing="4">
+    <HajurKoButton Title="Add new staff" OnClick="@_onAdd"/>
+    @foreach (var staff in _staffs)
+    {
+        <MudCard Outlined="true">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudAvatar Color="Color.Secondary">
+                        <MudText>@staff.UserName.First()</MudText>
+                    </MudAvatar>
+                </CardHeaderAvatar>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>@staff.UserName</MudText>
+                <MudText Typo="Typo.body2">@staff.Email</MudText>
+                @if (staff.LastSeenOn is not null)
+                {
+                    <MudText Typo="Typo.subtitle1">Last seen on @staff.LastSeenOn</MudText>
+                }
+            </MudCardContent>
+            <MudCardActions>
+                <MudIconButton Icon="@Icons.TwoTone.Delete" Variant="Variant.Text" Color="Color.Primary" OnClick="@(()=>_onDelete(staff.Id))">
+                    Delete
+                </MudIconButton>
+            </MudCardActions>
+        </MudCard>
+    }
+</MudStack>
+
+@code{
+
+    [Inject]
+    public StaffsRepository _repository { get; set; }
+
+    private bool _loading { get; set; }
+
+    private User[] _staffs { get; set; } = { };
+
+    private async Task _onAdd()
+    {
+        var model = await DialogService.ShowSignupAsync();
+        if(model is null) return;
+        Snackbar.Add("New staff added", Severity.Success);
+        var user = new User
+        {
+            Email = model.Email,
+            UserType = UserType.Staff,
+            UserName = model.Username,
+        };
+        _staffs = _staffs.Append(user).ToArray();
+    }
+
+    private async Task _onDelete(string staffId)
+    {
+        var confirmed = await DialogService.ShowDefaultAsync(
+            title: "Remove Staff?",
+            contentText: "Do you really want to remove this staff? This action is irreversible.",
+            confirmText: "Yes", color:
+                Color.Error
+            );
+        if (!confirmed) return;
+        var res = await _repository.DeleteStaff(staffId);
+        res.Fold(
+            left: err=>Snackbar.Add(err, Severity.Error),
+            right: msg =>
+            {
+                Snackbar.Add(msg, Severity.Success);
+                _staffs = _staffs.Where(s => !s.Id.Equals(staffId)).ToArray();
+            }
+            );
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+        var res = await _repository.GetAllStaffs();
+
+        res.Fold(
+            err => Snackbar.Add(err, Severity.Error),
+            users => _staffs = users
+            );
+
+        _loading = false;
+        await base.OnInitializedAsync();
+    }
+
+}

@@ -1,0 +1,113 @@
+﻿@using HajurKoCarRental.Shared.Models.DataModels
+@using HajurKoCarRental.Client.Features.Cars.Data
+@attribute [Route(Routes.Car)]
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject IJSRuntime JsRuntime
+@inject CarsRepository _repository
+
+@if (Car is not null)
+{
+    <HajurKoRow>
+        <HajurKoImageCard ImageUrl="@Car.PhotoUrl"/>
+        <MudStack Spacing="2">
+            <HajurKoRow>
+                <MudIcon Icon="@Icons.TwoTone.CarRental"/>
+                <MudText>@Car.Name</MudText>
+            </HajurKoRow>
+            <HajurKoRow>
+                <MudIcon Icon="@Icons.TwoTone.BrandingWatermark"/>
+                <MudText>@Car.Brand</MudText>
+            </HajurKoRow>
+            @if (Car.Color is not null)
+            {
+                <HajurKoRow>
+                    <MudIcon Icon="@Icons.TwoTone.ColorLens"/>
+                    <MudText>@Car.Color</MudText>
+                </HajurKoRow>
+            }
+            @if (Car.Mileage > 0)
+            {
+                <HajurKoRow>
+                    <MudIcon Icon="@Icons.TwoTone.SocialDistance"/>
+                    <MudText>@Car.Color</MudText>
+                </HajurKoRow>
+            }
+            @if (Car.Year > 0)
+            {
+                <HajurKoRow>
+                    <MudIcon Icon="@Icons.TwoTone.CalendarMonth"/>
+                    <MudText>@Car.Year</MudText>
+                </HajurKoRow>
+            }
+            <HajurKoRow>
+                <MudIcon Icon="@Icons.TwoTone.BrunchDining"/>
+                <MudText>@Car.FuelType</MudText>
+            </HajurKoRow>
+            <HajurKoRow>
+                <MudIcon Icon="@Icons.TwoTone.Transform"/>
+                <MudText>@Car.TransmissionType</MudText>
+            </HajurKoRow>
+            <MudButton Color="Color.Primary">
+                Request for rental<br/>
+                @if (Car.RentalRate!=newRentalRate())
+                {
+                    <del>@(Car.RentalRate)</del>
+                }
+                Rs. @Car.RentalRate
+            </MudButton>
+        </MudStack>
+    </HajurKoRow>
+}
+
+@code {
+
+    [CascadingParameter]
+    public BloodState _state { get; set; }
+
+    [Parameter]
+    public int Id { get; set; }
+
+    private bool _loading { get; set; }
+
+    private Car? Car { get; set; }
+    
+    private decimal newRentalRate()
+    {
+        if (Car!.RentalRate == 0) return 0;
+        var user = _state.User!;
+        var type = user.UserType;
+        if (type.Equals(UserType.Staff)||type.Equals(UserType.Admin))
+        {
+            const decimal percentage = 0.25m;
+            var reduction = Car!.RentalRate * percentage;
+            return Car!.RentalRate - reduction;
+        }
+        if (!_state.User!.UserType.Equals(UserType.Client) || !(user.LastOrderedAt > DateTime.UtcNow.AddMonths(-3))) return Car!.RentalRate;
+        {
+            const decimal percentage = 0.1m;
+            var reduction = Car!.RentalRate * percentage;
+            return Car!.RentalRate - reduction;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+        var res = await _repository.GetCar(Id);
+
+        res.Fold(
+            err => Snackbar.Add(err, Severity.Error),
+            car => Car = car
+            );
+
+        _loading = false;
+        await base.OnInitializedAsync();
+    }
+
+    private Task _goBack()
+    {
+        return NavigationManager.GoBackAsync(JsRuntime);
+    }
+
+}

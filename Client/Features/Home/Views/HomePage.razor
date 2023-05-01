@@ -1,0 +1,12 @@
+﻿@attribute [Route(Routes.Home)]
+
+<PageTitle>HajurKoCarRental</PageTitle>
+
+<MudText>@BloodState?.User?.Email</MudText>
+
+@code{
+
+    [CascadingParameter]
+    private BloodState? BloodState { get; set; }
+
+}

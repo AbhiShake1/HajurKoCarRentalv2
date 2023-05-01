@@ -1,0 +1,12 @@
+C:\Users\user\OneDrive\Documents\HajurKoCarRental\Shared\bin\Debug\net6.0\HajurKoCarRental.Shared.deps.json
+C:\Users\user\OneDrive\Documents\HajurKoCarRental\Shared\bin\Debug\net6.0\HajurKoCarRental.Shared.dll
+C:\Users\user\OneDrive\Documents\HajurKoCarRental\Shared\bin\Debug\net6.0\HajurKoCarRental.Shared.pdb
+C:\Users\user\OneDrive\Documents\HajurKoCarRental\Shared\obj\Debug\net6.0\HajurKoCarRental.Shared.csproj.AssemblyReference.cache
+C:\Users\user\OneDrive\Documents\HajurKoCarRental\Shared\obj\Debug\net6.0\HajurKoCarRental.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\user\OneDrive\Documents\HajurKoCarRental\Shared\obj\Debug\net6.0\HajurKoCarRental.Shared.AssemblyInfoInputs.cache
+C:\Users\user\OneDrive\Documents\HajurKoCarRental\Shared\obj\Debug\net6.0\HajurKoCarRental.Shared.AssemblyInfo.cs
+C:\Users\user\OneDrive\Documents\HajurKoCarRental\Shared\obj\Debug\net6.0\HajurKoCarRental.Shared.csproj.CoreCompileInputs.cache
+C:\Users\user\OneDrive\Documents\HajurKoCarRental\Shared\obj\Debug\net6.0\HajurKoCarRental.Shared.dll
+C:\Users\user\OneDrive\Documents\HajurKoCarRental\Shared\obj\Debug\net6.0\refint\HajurKoCarRental.Shared.dll
+C:\Users\user\OneDrive\Documents\HajurKoCarRental\Shared\obj\Debug\net6.0\HajurKoCarRental.Shared.pdb
+C:\Users\user\OneDrive\Documents\HajurKoCarRental\Shared\obj\Debug\net6.0\ref\HajurKoCarRental.Shared.dll

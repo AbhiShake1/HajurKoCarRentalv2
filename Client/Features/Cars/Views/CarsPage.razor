@@ -1,0 +1,52 @@
+﻿@using HajurKoCarRental.Client.Features.Cars.Data
+@using HajurKoCarRental.Shared.Models.DataModels
+@attribute [Route(Routes.Cars)]
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<PageTitle>Cars</PageTitle>
+
+<MudGrid>
+    @foreach (var car in _cars)
+    {
+        <MudItem>
+            <button onclick="@(() => _navigate(car.Id))">
+                <HajurKoImageCard Title="@_getCardTitle(car)" ImageUrl="@car.PhotoUrl"/>
+            </button>
+        </MudItem>
+    }
+</MudGrid>
+
+@code
+{
+    [Inject]
+    public CarsRepository _repository { get; set; }
+
+    private bool _loading { get; set; }
+
+    private Car[] _cars { get; set; } = { };
+
+    private void _navigate(int carId)
+    {
+        NavigationManager.NavigateTo(Routes.Car.ReplaceInUrl(carId));
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _loading = true;
+        var res = await _repository.GetAllCars();
+
+        res.Fold(
+            err => Snackbar.Add(err, Severity.Error),
+            cars => _cars = cars
+            );
+
+        _loading = false;
+        await base.OnInitializedAsync();
+    }
+
+    private string _getCardTitle(Car car)
+    {
+        return $"{car.Name} by {car.Brand}";
+    }
+}

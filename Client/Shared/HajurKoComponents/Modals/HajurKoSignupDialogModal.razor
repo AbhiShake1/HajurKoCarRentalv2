@@ -1,0 +1,20 @@
+﻿@using HajurKoCarRental.Shared.Types
+<MudDialog>
+    <DialogContent>
+        <HajurKoSignupForm OnSuccess="@_onSuccess"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    void Cancel() => MudDialog.Cancel();
+
+    private async Task _onSuccess(SignupRequestModel model)
+    {
+        MudDialog.Close(DialogResult.Ok(model));
+    }
+}

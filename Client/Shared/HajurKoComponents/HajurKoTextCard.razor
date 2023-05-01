@@ -1,0 +1,11 @@
+﻿<MudCard Outlined="true" class="d-flex mx-12" style="height:100%; background-color: #af0307; padding: 8px; color: white;">
+    <MudText Class="mx-auto my-auto" Align="Align.Center">
+        @ChildContent
+    </MudText>
+</MudCard>
+
+@code
+{
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+}

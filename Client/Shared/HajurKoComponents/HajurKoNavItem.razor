@@ -1,0 +1,20 @@
+﻿<MudStack Spacing="1" AlignItems="AlignItems.Center">
+    <HajurKoButton Typo="Typo.body2" Color="Color.Transparent" Title="@Title" Variant="Variant.Text" Href="@Href"/>
+    @if (Enabled)
+    {
+        <Animation Effect="@Effect.Wobble" OptionsName="Custom">
+            <MudPaper Width="40px" Height="2px" Elevation="4" Class="mud-theme-primary"/>
+        </Animation>
+    }
+</MudStack>
+
+@code {
+    [Parameter]
+    public string Title { get; set; }
+    
+    [Parameter]
+    public string Href { get; set; }
+
+    [Parameter]
+    public bool Enabled { get; set; } = false;
+}

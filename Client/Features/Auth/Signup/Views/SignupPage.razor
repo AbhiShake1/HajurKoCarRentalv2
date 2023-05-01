@@ -1,0 +1,45 @@
+﻿@using HajurKoCarRental.Shared.Types
+@using HajurKoCarRental.Client.Features.Auth.Data
+@using HajurKoCarRental.Client.Features.Auth.Signup.Views.Components
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@attribute [Route("/")]
+@attribute [Route(Routes.Signup)]
+
+<PageTitle>Signup</PageTitle>
+
+<HajurKoRow>
+    <HajurKoElevatedPaper Width="60%" Color="ColorScheme.Primary">
+        <MudText Class="mx-4" Style="margin-bottom: 20%;" Typo="Typo.subtitle1">
+            Hajur Ko Car Rental
+        </MudText>
+        <MudText Class="mx-4" Style="margin-bottom: 2px;" Typo="Typo.h4">
+            Welcome back! Let's start your journey with us.
+        </MudText>
+        <MudText Class="mx-4" Style="margin-bottom: 64px;" Typo="Typo.caption">
+            Discover and rent best vehicles for your needs
+        </MudText>
+        <MudText Class="mx-4" Style="margin-bottom: 64px;" Typo="Typo.subtitle1">
+        </MudText>
+        <SignupCarousel/>
+    </HajurKoElevatedPaper>
+
+    <HajurKoElevatedPaper Width="100%" PaddingX="8">
+        <MudText Typo="Typo.h3">
+            Sign up
+        </MudText>
+        <MudText Typo="Typo.subtitle2">
+            Have an account already? <MudLink Href="@Routes.Login">Login</MudLink>
+        </MudText>
+        <HajurKoSignupForm OnSuccess="@_onSuccess"/>
+    </HajurKoElevatedPaper>
+</HajurKoRow>
+
+@code {
+
+    private async Task _onSuccess(SignupRequestModel _)
+    {
+        NavigationManager.NavigateTo(Routes.Login);
+        Snackbar.Add("Registered successfully.", Severity.Success);
+    }
+}

@@ -1,0 +1,89 @@
+﻿@using HajurKoCarRental.Client.Features.Auth.Data
+@using HajurKoCarRental.Shared.Types
+@inject AuthRepository _repository
+@inject ISnackbar Snackbar
+
+<MudForm @ref="_form" @bind-IsValid="@_success" ReadOnly="false">
+    <MudStack>
+        <MudTextField Variant="Variant.Outlined" T="string" Label="Username"
+                      Required="true" RequiredError="User name is required!" @ref="_username"/>
+        <MudTextField Variant="Variant.Outlined" T="string" Label="Email" Required="true" RequiredError="Email is required!"
+                      @ref="_email"
+                      Validation="@(new EmailAddressAttribute { ErrorMessage = "The email address is invalid" })"/>
+        <MudTextField Variant="Variant.Outlined" T="string"
+                      Label="Password" HelperText="Choose a strong password" @ref="_password"
+                      InputType="InputType.Password"
+                      Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                      RequiredError="Password is required!"/>
+        <MudTextField Variant="Variant.Outlined" T="string"
+                      Label="Password" HelperText="Repeat the password" InputType="InputType.Password" Required="true"
+                      Validation="@(new Func<string, IEnumerable<string>>(PasswordMatch))"/>
+        <div style="text-align: center;">
+            <HajurKoButton
+                Icon="@Icons.Material.Outlined.PersonOutline"
+                Disabled="@(!_success)"
+                OnClick="@_handleRegisterAsync"
+                Title="Register"
+                Loading="@_loading"/>
+        </div>
+    </MudStack>
+</MudForm>
+
+@code {
+    bool _success;
+    MudTextField<string>? _password, _username, _email;
+    MudForm? _form;
+    bool _loading;
+
+    [Parameter] public Func<SignupRequestModel, Task> OnSuccess { get; set; }
+
+    private void _setLoading(bool loading)
+    {
+        _loading = loading;
+        StateHasChanged();
+    }
+
+    private async Task _handleRegisterAsync()
+    {
+        _setLoading(true);
+        var model = new SignupRequestModel
+        {
+            Username = _username!.Text,
+            Email = _email!.Text,
+            Password = _password!.Text
+        };
+        var res = await _repository.Register(model);
+        res.Fold(
+            err => Snackbar.Add(err, Severity.Error),
+            data =>
+            {
+                OnSuccess(model);
+            }
+            );
+        _setLoading(false);
+    }
+    
+    private static IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, "[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, "[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, "[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+    private IEnumerable<string> PasswordMatch(string arg)
+    {
+        var match = _password?.Value != arg ? "Passwords don't match" : null;
+        if (match is not null)
+            yield return match;
+    }
+}

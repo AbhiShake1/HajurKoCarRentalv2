@@ -1,0 +1,122 @@
+﻿@using HajurKoCarRental.Client.Features.Auth.Data
+@using HajurKoCarRental.Client.Features.Auth.Login.Views.Components
+@using HajurKoCarRental.Shared.Types
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@attribute [Route(Routes.Login)]
+
+<PageTitle>Login</PageTitle>
+
+<HajurKoRow>
+    <HajurKoElevatedPaper Width="60%" Color="ColorScheme.Primary">
+        <MudText Class="mx-4" Style="margin-bottom: 20%;" Typo="Typo.subtitle1">
+            Hajur Ko Car Rental
+        </MudText>
+        <MudText Class="mx-4" Style="margin-bottom: 2px;" Typo="Typo.h4">
+            Welcome back! Let's continue your journey with us.
+        </MudText>
+        <MudText Class="mx-4" Style="margin-bottom: 64px;" Typo="Typo.caption">
+            Rent your next vehicle and get on the road again
+        </MudText>
+        <MudText Class="mx-4" Style="margin-bottom: 64px;" Typo="Typo.subtitle1">
+        </MudText>
+        <LoginCarousel/>
+    </HajurKoElevatedPaper>
+    <HajurKoElevatedPaper Width="100%" PaddingX="8">
+        <MudText Typo="Typo.h3">
+            Sign in
+        </MudText>
+        <MudText Typo="Typo.subtitle2">
+            No account yet? <MudLink Href="@Routes.Signup">Signup</MudLink>
+        </MudText>
+        <MudForm @ref="_form" @bind-IsValid="@_success" ReadOnly="false">
+            <MudStack>
+                <MudTextField Variant="Variant.Outlined" T="string" Label="Email"
+                              Required="true" RequiredError="Email is required!"
+                              Validation="@(new Func<string, IEnumerable<string>>(ValidEmail))"
+                              @ref="_emailField"/>
+                <MudTextField Variant="Variant.Outlined" T="string"
+                              Label="Password" @ref="_pwField"
+                              InputType="InputType.Password"
+                              Validation="@(new Func<string, IEnumerable<string>>(PasswordStrength))" Required="true"
+                              RequiredError="Password is required!"/>
+                <div style="text-align: center;">
+                    <HajurKoButton
+                        Icon="@Icons.Outlined.PersonOutline"
+                        Disabled="@(!_success)"
+                        Loading="@_loading"
+                        OnClick="@_handleLoginAsync"
+                        Title="Sign in"/>
+                </div>
+            </MudStack>
+        </MudForm>
+    </HajurKoElevatedPaper>
+</HajurKoRow>
+
+@code {
+    bool _success;
+    MudTextField<string>? _pwField, _emailField;
+    MudForm? _form;
+    bool _loading;
+
+    [Inject]
+    private AuthRepository _repository { get; set; }
+
+    [CascadingParameter] public BloodState _state { get; set; }
+
+    private void _setLoading(bool loading)
+    {
+        _loading = loading;
+        StateHasChanged();
+    }
+
+    private async Task _handleLoginAsync()
+    {
+        _setLoading(true);
+        var res = await _repository.Login(new LoginRequestModel(_emailField!.Value, _pwField!.Value));
+        res.Fold(
+            err => Snackbar.Add(err, Severity.Error),
+            data =>
+            {
+                _state.Permissions = data?.Permissions;
+                _state.User = data?.User;
+                NavigationManager.NavigateTo(Routes.Home);
+            }
+            );
+        _setLoading(false);
+    }
+
+    private static IEnumerable<string> ValidEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            yield return "Email is required!";
+            yield break;
+        }
+
+        var pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+
+        if (!Regex.IsMatch(email, pattern))
+        {
+            yield return "Email is not valid!";
+        }
+    }
+
+    private static IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, "[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, "[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, "[0-9]"))
+            yield return "Password must contain at least one digit";
+    }
+
+}

@@ -1,0 +1,31 @@
+﻿<MudPaper Width="250px" Elevation="0">
+    <MudNavMenu Rounded="true" Margin="Margin.None" Color="Color.Primary" Class="pa-4">
+        <MudNavLink Href="@Routes.Home" Icon="@Icons.TwoTone.Home">Home</MudNavLink>
+        @if (BloodState.Permissions!.CanGetCars)
+        {
+            <MudNavLink Href="@Routes.Cars" Icon="@Icons.TwoTone.CarRental">Cars</MudNavLink>
+        }
+        @if (BloodState.Permissions?.CanGetStaffs ?? false)
+        {
+            <MudNavLink Href="@Routes.Staffs" Icon="@Icons.TwoTone.NaturePeople">Staffs</MudNavLink>
+        }
+        @if (BloodState.Permissions?.CanGetRentalRequests ?? false)
+        {
+            <MudNavLink Href="@Routes.Requests" Icon="@Icons.TwoTone.RequestPage">Requests</MudNavLink>
+        }
+        <MudNavLink Href="@Routes.Profile" Icon="@Icons.TwoTone.PersonOutline">Profile</MudNavLink>
+        @if (BloodState.Permissions?.CanGetDamages ?? false)
+        {
+            <MudNavLink Href="@Routes.DamageRequests" Icon="@Icons.TwoTone.CarCrash">
+                Damage Requests
+            </MudNavLink>
+        }
+    </MudNavMenu>
+</MudPaper>
+
+@code{
+
+    [CascadingParameter]
+    public BloodState BloodState { get; set; }
+
+}

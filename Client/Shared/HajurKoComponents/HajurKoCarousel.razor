@@ -1,0 +1,14 @@
+﻿<MudCarousel Class="mud-width-full" Style="@GetStyle" ShowArrows="false" ShowBullets="false" EnableSwipeGesture="true" AutoCycle="true" TData="string">
+    @ChildContent
+</MudCarousel>
+
+@code {
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public double Height { get; set; } = 200;
+
+    private string GetStyle => $"height:{Height}px;";
+}

@@ -1,0 +1,56 @@
+﻿@using HajurKoCarRental.Shared.Types
+<Animation>
+    <MudButton Variant="Variant"
+               Size="Size.Large" EndIcon="@ButtonIcon"
+               OnClick="@_onClick"
+               Href="@Href"
+               Disabled="@ButtonDisabled" Color="@Color">
+        @if (Loading)
+        {
+            <MudProgressCircular Color="Color.Primary" Size="Size.Small" Indeterminate="true"/>
+        }
+        else
+        {
+            <MudText Typo="@Typo">@Title</MudText>
+        }
+    </MudButton>
+</Animation>
+
+@code {
+
+    [Parameter]
+    public string? Href { get; set; }
+
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Filled;
+
+    [Parameter]
+    public Typo Typo { get; set; } = Typo.inherit;
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public Color Color { get; set; } = Color.Primary;
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public AsyncVoidCallback? OnClick { get; set; }
+
+    [Parameter]
+    public bool Loading { get; set; }
+
+    [Parameter]
+    public string Title { get; set; } = "";
+
+    private string? ButtonIcon => Loading ? null : Icon;
+    private bool ButtonDisabled => Disabled || Loading;
+
+    private void _onClick()
+    {
+        OnClick?.Invoke();
+    }
+
+}
